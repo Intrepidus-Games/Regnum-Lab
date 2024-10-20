@@ -3,6 +3,9 @@ class RegnumLab
 {
     constructor()
     {
+        this.events = {
+            "update": new SignalFloat()
+        }
         this.scene = new RegnumScene();
         this.stats = new RegnumStats();
         this.defaults();
@@ -12,31 +15,40 @@ class RegnumLab
     {
         this.scene.init();
 
-        this.scene.createPlane("plane", 5, 5);
+        //this.scene.createPlane("plane", 5, 5);
+        //this.scene.createBox("box", 5, 5);
+
+        //this.scene.createLine();
     }
 
     animate(deltaTime) 
     {
-        requestAnimationFrame(()=>{ this.animate(this.stats.update()); });
+        this.events["update"].fire(this.stats.deltaTime);
         //this.stats.fps.textContent = "FPS 120";
 
-        this.scene.renderer.render(this.scene.scene, this.scene.camera);
-    }
+        //rotateAround(this.scene.camera, new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,1));
 
-    onWindowResize()
-    {
-        console.log("resize");
-        this.scene.camera.aspect = window.innerWidth / window.innerHeight;
-        this.scene.camera.updateProjectionMatrix();
-        this.scene.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.scene.renderer.render(this.scene.scene, this.scene.camera);
+        requestAnimationFrame(()=>{ this.animate(this.stats.update()); });
     }
 
     defaults()
     {
-        window.addEventListener("resize", ()=>{this.onWindowResize()})
         this.init();
         this.animate();
     }
+
+    addEvent(event, caller)
+    {
+        if (this.events[event] != null)
+        {
+            this.events[event].subscribe(caller);
+        }
+        else
+        {
+            console.error(`The event: '${event} does not exist.'`);
+        }
+    }
 }
 
-const LAB = new RegnumLab();
+const REGNUMLAB = new RegnumLab();
