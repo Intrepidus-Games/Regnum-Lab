@@ -28,7 +28,7 @@ class RegnumScene
             1000
         );
     
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha:true });
     
         this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
@@ -66,7 +66,6 @@ class RegnumScene
             // Example: Rotate the object based on mouse movement
             const rotationSpeed = 1;
             rotateAround(this.camera, new THREE.Vector3(0,0,0), new THREE.Vector3(-deltaMove.y/2, 0,-deltaMove.x/2));
-            console.log(deltaMove.x);
         }
         
         this.previousMousePosition = { x: event.clientX, y: event.clientY };

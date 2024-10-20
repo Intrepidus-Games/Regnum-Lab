@@ -54,7 +54,8 @@ function rotateAround(obj, pivotPoint = new THREE.Vector3, rotation = new THREE.
   if (up == null) {up = rotation}
   obj.up.set(up.x,up.y,up.z);
 }*/
-function rotateAround(obj, pivotPoint = new THREE.Vector3(), rotationAxis  = new THREE.Vector3()) {
+
+function rotateAround(obj, pivotPoint = new THREE.Vector3(), rotationAxis  = new THREE.Vector3(), rotate=true) {
   // Calculate the current offset from the pivot point (distance between camera and pivot)
   const offset = obj.position.clone().sub(pivotPoint);
 
@@ -74,16 +75,19 @@ function rotateAround(obj, pivotPoint = new THREE.Vector3(), rotationAxis  = new
   // Update the camera's position to maintain the same distance from the pivot
   obj.position.copy(pivotPoint).add(newOffset);
 
-  // Calculate the direction the camera should face (from camera to pivot)
-  const direction = pivotPoint.clone().sub(obj.position).normalize();
+  if (rotate)
+  {
+    // Calculate the direction the camera should face (from camera to pivot)
+    const direction = pivotPoint.clone().sub(obj.position).normalize();
 
-  // Create a new quaternion that represents this direction and apply it to the camera
-  const up = new THREE.Vector3(0, 0, 1); // Keep the up vector consistent
-  const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(
-      new THREE.Vector3(0, 0, -1), // Default camera forward direction
-      direction // New direction towards the pivot point
-  );
+    // Create a new quaternion that represents this direction and apply it to the camera
+    const up = new THREE.Vector3(0, 0, 1); // Keep the up vector consistent
+    const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(
+        new THREE.Vector3(0, 0, -1), // Default camera forward direction
+        direction // New direction towards the pivot point
+    );
 
-  obj.quaternion.copy(targetQuaternion); // Apply the rotation to the camera
-  obj.up.copy(up); // Ensure the up vector remains correct
+    obj.quaternion.copy(targetQuaternion); // Apply the rotation to the camera
+    obj.up.copy(up); // Ensure the up vector remains correct
+  }
 }
