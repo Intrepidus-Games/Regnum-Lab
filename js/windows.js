@@ -117,7 +117,7 @@ function captureConsole() {
 
     console.error = function (message) {
         logWithStyle(message, originalConsole.error);
-        originalConsole.error.apply(console, arguments); // Call original console.error
+        //originalConsole.error.apply(console, arguments); // Call original console.error
     };
 
     window.onerror = function(message, source, lineno, colno, error) {

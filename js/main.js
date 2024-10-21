@@ -23,6 +23,7 @@ class RegnumLab
 
     animate(deltaTime) 
     {
+        this.scene.doSceneUpdate(this.stats.deltaTime);
         this.events["update"].fire(this.stats.deltaTime);
         //this.stats.fps.textContent = "FPS 120";
 

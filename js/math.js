@@ -1,3 +1,48 @@
+
+/* 
+  //-------------------------//
+  MOVE RELATED
+  //-------------------------//
+*/
+function moveObject(obj, vector = new THREE.Vector3)
+{
+  obj.position.x = vector.x;
+  obj.position.y = vector.y;
+  obj.position.z = vector.z;
+}
+function addVectorPositionObject(obj, vector = new THREE.Vector3)
+{
+  obj.position.x += vector.x;
+  obj.position.y += vector.y;
+  obj.position.z += vector.z;
+}
+
+/* 
+  //-------------------------//
+  ROTATION RELATED
+  //-------------------------//
+*/
+function lookAt(look, at)
+{
+  const direction = new THREE.Vector3();
+  at.getWorldPosition(direction);
+  look.quaternion.copy(at.quaternion); // Copy the camera's rotation directly
+}
+
+function faceTarget(obj, pos) {
+  // Calculate direction from camera to target
+  const direction = new THREE.Vector3();
+  direction.subVectors(pos, obj.position).normalize();
+  
+  // Calculate the up vector, which we want to maintain as (0, 1, 0) for a standard look
+  const up = new THREE.Vector3(0, 1, 0);
+  
+  // Create a quaternion based on the camera's direction and up vector
+  const lookAtQuaternion = new THREE.Quaternion().setFromUnitVectors(up, direction);
+  
+  // Apply the quaternion to the camera
+  obj.quaternion.copy(lookAtQuaternion);
+}
 function deg2rad(degrees)
 {
   return degrees * (Math.PI/180);
@@ -17,18 +62,6 @@ function addRotateObject(obj, vector = new THREE.Vector3)
   obj.rotation.x += vector.x;
   obj.rotation.y += vector.y;
   obj.rotation.z += vector.z;
-}
-function moveObject(obj, vector = new THREE.Vector3)
-{
-  obj.position.x = vector.x;
-  obj.position.y = vector.y;
-  obj.position.z = vector.z;
-}
-function addVectorPositionObject(obj, vector = new THREE.Vector3)
-{
-  obj.position.x += vector.x;
-  obj.position.y += vector.y;
-  obj.position.z += vector.z;
 }
 function vector2rad(vector)
 {
@@ -54,7 +87,6 @@ function rotateAround(obj, pivotPoint = new THREE.Vector3, rotation = new THREE.
   if (up == null) {up = rotation}
   obj.up.set(up.x,up.y,up.z);
 }*/
-
 function rotateAround(obj, pivotPoint = new THREE.Vector3(), rotationAxis  = new THREE.Vector3(), rotate=true) {
   // Calculate the current offset from the pivot point (distance between camera and pivot)
   const offset = obj.position.clone().sub(pivotPoint);
@@ -77,6 +109,7 @@ function rotateAround(obj, pivotPoint = new THREE.Vector3(), rotationAxis  = new
 
   if (rotate)
   {
+    
     // Calculate the direction the camera should face (from camera to pivot)
     const direction = pivotPoint.clone().sub(obj.position).normalize();
 
@@ -90,4 +123,36 @@ function rotateAround(obj, pivotPoint = new THREE.Vector3(), rotationAxis  = new
     obj.quaternion.copy(targetQuaternion); // Apply the rotation to the camera
     obj.up.copy(up); // Ensure the up vector remains correct
   }
+}
+
+/* 
+  //-------------------------//
+  COLOR RELATED
+  //-------------------------//
+*/
+/*
+function rgbaToHex(r, g, b, a) {
+  const toHex = (x) => {
+      const hex = Math.round(x).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+  };
+
+  // Convert RGBA to HEX with alpha as a separate hex value
+  const hex = `0x${toHex(r)}${toHex(g)}${toHex(b)}`;//${toHex(a * 255)}`; // Alpha as a value from 0-255
+  return hex;
+}
+  */
+
+function rgbaToHex(r, g, b) {
+  // Create a new THREE.Color object
+  const color = new THREE.Color();
+
+  // Set the color using RGBA values (0-1 range for each channel)
+  color.setRGB(r / 255, g / 255, b / 255); // Normalize RGB values to [0, 1]
+
+  // Optionally, you can set the alpha value if needed
+
+  // Convert to HEX
+  const hex = color.getHexString(); // This returns the hex representation
+  return color;
 }
