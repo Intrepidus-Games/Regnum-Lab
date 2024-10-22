@@ -25,10 +25,12 @@ function createTornado() {
         const x = (r * Math.cos(angle)) + (Math.random() * 0.1 - 0.05);
         const y = (r * Math.sin(angle)) + (Math.random() * 0.1 - 0.05);
 
+        const grayValue = Math.max(0.3 + Math.random() - 0.7, 0.3);
+        const color = new THREE.Color(grayValue, grayValue, grayValue);
 
         const mesh = Math.random() < 0.5 ? 
-        REGNUMLAB.scene.createSphere("sphere", new THREE.Vector3(0.05, 8, 8), 0x0077ff): 
-        REGNUMLAB.scene.createBox("box", new THREE.Vector3(0.05, 0.05, 0.05), 0x0077ff);
+            REGNUMLAB.scene.createSphere("sphere", new THREE.Vector3(0.05, 8, 8), color): 
+            REGNUMLAB.scene.createBox("box", new THREE.Vector3(0.05, 0.05, 0.05), color);
         mesh.position.set(x, y, z);
         tornado.push(mesh);
     }
