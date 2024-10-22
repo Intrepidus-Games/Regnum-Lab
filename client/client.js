@@ -10,7 +10,7 @@ REGNUMLAB.addEvent("update", update)
 
 let tornado = [];
 const speed = 45;
-const height = 3; 
+const height = 3.2; 
 const radius = 1;
 const segments = 1000;
 
