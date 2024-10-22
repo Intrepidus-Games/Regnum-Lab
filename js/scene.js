@@ -173,7 +173,7 @@ class RegnumScene
     createPlane(name="plane", vector=new THREE.Vector2(1,1), color=0x353738)
     {
         const geometry = new THREE.PlaneGeometry( vector.x, vector.y );
-        const material = new THREE.MeshBasicMaterial( {color: color} );
+        const material = new THREE.MeshBasicMaterial( {color: color, side: THREE.DoubleSide} );
         const plane = new THREE.Mesh( geometry, material );
         //plane.rotation.x = 90;
 
@@ -184,6 +184,17 @@ class RegnumScene
     createBox(name="box", vector=new THREE.Vector2(1,1, 1), color=0x484359)
     {
         const geometry = new THREE.BoxGeometry( vector.x, vector.y, vector.z );
+        const material = new THREE.MeshBasicMaterial( {color: color, side: THREE.DoubleSide} );
+        const plane = new THREE.Mesh( geometry, material );
+        //plane.rotation.x = 90;
+
+        this.addToScene(name, plane);
+
+        return plane;
+    }
+    createSphere(name="sphere", vector=new THREE.Vector2(1,1, 1), color=0x484359)
+    {
+        const geometry = new THREE.SphereGeometry( vector.x, vector.y, vector.z );
         const material = new THREE.MeshBasicMaterial( {color: color, side: THREE.DoubleSide} );
         const plane = new THREE.Mesh( geometry, material );
         //plane.rotation.x = 90;

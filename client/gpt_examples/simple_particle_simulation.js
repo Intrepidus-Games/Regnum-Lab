@@ -6,7 +6,7 @@ const particleCount = 1000;
 
 // Create smoke particles using cubes (boxes)
 function createParticle() {
-    const particle = REGNUMLAB.scene.createBox("box", new THREE.Vector3(0.1, 0.1, 0.1), 0x8a8a8a);
+    const particle = REGNUMLAB.scene.createPlane("particle", new THREE.Vector3(0.1, 0.1, 0.1), 0x8a8a8a);
 
      // Initial position
      particle.position.set(
