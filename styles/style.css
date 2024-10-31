@@ -67,7 +67,7 @@ body {
     position: absolute;
     background-color: var(--tab-color);
     width: 99.4vw;
-    height: 95px;
+    height: 195px;
     grid-row: 2;
     border-radius: 10px;
     justify-self: center;

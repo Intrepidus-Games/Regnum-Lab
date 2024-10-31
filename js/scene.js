@@ -18,12 +18,14 @@ class RegnumScene
     constructor()
     {
         this.scene = null;
+        this.sceneTree = null;
         this.renderer = null;
         this.camera = null;
 
         this.canvas = null;
 
         // mouse
+        this.sensitivity = 1;
         this.isDragging = false;
         this.previousMousePosition = { x: 0, y: 0 };
 
@@ -32,6 +34,8 @@ class RegnumScene
         this.fonts = {
             "NunitoSansRegular": null
         }
+
+
     }
 
     init()
@@ -39,6 +43,7 @@ class RegnumScene
         this.canvas = document.getElementById("scene");
 
         this.scene = new THREE.Scene();
+        
 
         this.camera = new THREE.PerspectiveCamera(
             75, 
@@ -51,17 +56,18 @@ class RegnumScene
     
         this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
-
         this.canvas.appendChild(this.renderer.domElement);
-
 
         // Camera Defaults
         this.camera.position.y = -5;
         this.camera.position.z = 5;
-        this.camera.rotation.x += deg2rad(180);
         this.camera.rotation.x = deg2rad(45);
 
         // Create scene defaults
+
+        // Scene Tree Group
+        this.sceneTree = new THREE.Group();
+        this.scene.add( this.sceneTree );
 
         // Load Fonts
         this.loadFonts(()=>{
@@ -91,6 +97,7 @@ class RegnumScene
         this.renderer.domElement.addEventListener("mouseup", ()=>{  this.isDragging=false; })
         this.renderer.domElement.addEventListener("mouseout", ()=>{ this.isDragging=false; })
         this.renderer.domElement.addEventListener("mousemove", (e)=>{ this.mouseMove(e); })
+        this.renderer.domElement.addEventListener("wheel", (e)=>{ this.scrollWheel(e); })
     }
 
     loadFonts(callback)
@@ -109,6 +116,18 @@ class RegnumScene
         });
     }
 
+    
+
+    scrollWheel(event)
+    {
+        
+        const delta = clamp(event.deltaY, -1, 1); // Normalize Delta
+        if (this.camera.position.distanceTo(new THREE.Vector3) > 1 || delta > 0)
+        {
+            this.camera.translateZ(delta);
+        }
+    }
+
     mouseMove(event)
     {
         // If the mouse is being dragged
@@ -119,8 +138,14 @@ class RegnumScene
             };
         
             // Example: Rotate the object based on mouse movement
-            const rotationSpeed = 1;
-            rotateAround(this.camera, new THREE.Vector3(0,0,0), new THREE.Vector3(-deltaMove.y/2, 0,-deltaMove.x/2));
+            //const rotationSpeed = 1;
+            //rotateAround(this.camera, new THREE.Vector3(0,0,0), new THREE.Vector3(-deltaMove.y/2, 0,-deltaMove.x/2));
+            //const quaternion = new THREE.Quaternion();
+            //quaternion.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), -deltaMove.x/2 * this.sensitivity / Math.PI / 2 );
+
+            //this.sceneTree.applyQuaternion(quaternion);
+            this.sceneTree.rotation.z += deltaMove.x * this.sensitivity / 16 / Math.PI;
+            this.sceneTree.rotation.x += deltaMove.y * this.sensitivity / 16 / Math.PI;
         }
         
         this.previousMousePosition = { x: event.clientX, y: event.clientY };
@@ -156,7 +181,8 @@ class RegnumScene
 
     addToScene(name, obj)
     {
-        this.scene.add(obj);
+        //this.scene.add(obj);
+        this.sceneTree.add(obj);
         let objName = name;
         if (this.sceneList[name] != null)
         {
