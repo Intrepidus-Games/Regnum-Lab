@@ -8,9 +8,20 @@
 
 REGNUMLAB.addEvent("update", update)
 
-const box = REGNUMLAB.scene.createBox("box", new THREE.Vector3(0.5, 0.5, 0.5), 0x0077ff);
+
+
+const speed = 30;
+const radius = 1;
+const width = 2;
+
+const shapeSize = 0.3;
+
+const box = REGNUMLAB.scene.createBox("box", new THREE.Vector3(shapeSize, shapeSize, shapeSize), 0x0077ff);
 
 function update(deltaTime)
 {
-    box.position.x = 50 * Math.sin(deltaTime*50) * deltaTime;
+    time = performance.now()/1000;
+    box.position.x = radius * Math.sin(time*speed/2);
+    box.position.z = radius * Math.sin(time*speed);
+    box.position.y = radius * Math.sin(time*speed/2);
 }
