@@ -13,6 +13,13 @@ class RegnumSceneObject
     }
 }
 
+const Shapes = Object.freeze({
+    Box: 0,
+    Sphere: 1,
+    Plane: 2,
+    Cone: 3
+});
+
 class RegnumScene
 {
     constructor()
@@ -91,6 +98,17 @@ class RegnumScene
             y.position.y = 2;
             z.position.z = 2;
         });
+
+        // light
+        const light = this.createLight("light", 0xfff, 500000);
+        light.position.set(0,5,0);
+        light.target.position.set(0,0,0);
+        //light.position.z = 5;
+        //light.rotation.x = deg2rad(90);
+        console.log(light.rotation)
+
+        const lightSphere = this.createPrimative("lightCone", Shapes.Cone,new THREE.Vector3(1, 2, 32));
+        light.add(lightSphere);
         
         window.addEventListener("resize", ()=>{this.onWindowResize()})
         this.renderer.domElement.addEventListener("mousedown", ()=>{ this.isDragging=true; })
@@ -196,6 +214,24 @@ class RegnumScene
         //console.log(this.sceneList);
     }
 
+    createPrimative(name="object", shape, vector, color=0x353738)
+    {
+        let geometry;
+        if (shape == Shapes.Box)
+        {
+            geometry = new THREE.BoxGeometry(vector.x, vector.y, vector.z);
+        }
+        else if (shape == Shapes.Cone)
+        {
+            geometry = new THREE.ConeGeometry(vector.x, vector.y, vector.z);
+        }
+
+        const material = new THREE.MeshLambertMaterial( {color: color, side: THREE.DoubleSide} );
+        const mesh = new THREE.Mesh(geometry, material);
+        this.addToScene(name, mesh);
+        return mesh;
+    }
+
     createPlane(name="plane", vector=new THREE.Vector2(1,1), color=0x353738)
     {
         const geometry = new THREE.PlaneGeometry( vector.x, vector.y );
@@ -207,7 +243,7 @@ class RegnumScene
 
         return plane;
     }
-    createBox(name="box", vector=new THREE.Vector2(1,1, 1), color=0x484359)
+    createBox(name="box", vector=new THREE.Vector2(1,1,1), color=0x484359)
     {
         const geometry = new THREE.BoxGeometry( vector.x, vector.y, vector.z );
         const material = new THREE.MeshBasicMaterial( {color: color, side: THREE.DoubleSide} );
@@ -218,7 +254,7 @@ class RegnumScene
 
         return plane;
     }
-    createSphere(name="sphere", vector=new THREE.Vector2(1,1, 1), color=0x484359)
+    createSphere(name="sphere", vector=new THREE.Vector2(1,1,1), color=0x484359)
     {
         const geometry = new THREE.SphereGeometry( vector.x, vector.y, vector.z );
         const material = new THREE.MeshBasicMaterial( {color: color, side: THREE.DoubleSide} );
@@ -236,6 +272,7 @@ class RegnumScene
         const line = new THREE.Line( geometry, material );
 
         this.addToScene(name, line);
+        return line;
     }
     createTextLabel(name = "text", text = "text", color = 0xbddbf0, lookAtCamera = false) {
         // Create the text geometry after the font is loaded
@@ -261,5 +298,14 @@ class RegnumScene
         const object = this.addToScene(name, textMesh);
         object.lookAtCamera(lookAtCamera);
         return textMesh;
+    }
+
+    createLight(name="light", color = 0xfff, intensity = 5)
+    {
+        const light = new THREE.DirectionalLight(color, intensity);
+
+        this.addToScene(name, light);
+        this.addToScene(name, light.target);
+        return light;
     }
 }
