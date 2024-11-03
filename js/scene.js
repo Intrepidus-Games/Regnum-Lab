@@ -20,6 +20,12 @@ const Shapes = Object.freeze({
     Cone: 3
 });
 
+const MaterialMethod = Object.freeze({
+    Basic: 0,
+    Lambert: 1,
+});
+
+
 class RegnumScene
 {
     constructor()
@@ -28,7 +34,7 @@ class RegnumScene
         this.sceneTree = null;
         this.renderer = null;
         this.camera = null;
-
+        this.inputManager = null;
         this.canvas = null;
 
         // mouse
@@ -41,8 +47,6 @@ class RegnumScene
         this.fonts = {
             "NunitoSansRegular": null
         }
-
-
     }
 
     init()
@@ -50,7 +54,6 @@ class RegnumScene
         this.canvas = document.getElementById("scene");
 
         this.scene = new THREE.Scene();
-        
 
         this.camera = new THREE.PerspectiveCamera(
             75, 
@@ -64,6 +67,9 @@ class RegnumScene
         this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
         this.canvas.appendChild(this.renderer.domElement);
+
+        // Input Manager
+        this.inputManager = new RegnumSceneInputManager(this.canvas.getElementsByTagName("canvas")[0]);
 
         // Camera Defaults
         this.camera.position.y = -5;
@@ -107,8 +113,8 @@ class RegnumScene
         //light.rotation.x = deg2rad(90);
         console.log(light.rotation)
 
-        const lightSphere = this.createPrimative("lightCone", Shapes.Cone,new THREE.Vector3(1, 2, 32));
-        light.add(lightSphere);
+        //const lightSphere = this.createPrimative("lightCone", Shapes.Cone,new THREE.Vector3(1, 2, 32));
+        //light.add(lightSphere);
         
         window.addEventListener("resize", ()=>{this.onWindowResize()})
         this.renderer.domElement.addEventListener("mousedown", ()=>{ this.isDragging=true; })
@@ -214,7 +220,7 @@ class RegnumScene
         //console.log(this.sceneList);
     }
 
-    createPrimative(name="object", shape, vector, color=0x353738)
+    createPrimative(name="object", shape, vector, color=0x353738, materialMethod=MaterialMethod.Basic)
     {
         let geometry;
         if (shape == Shapes.Box)
@@ -226,7 +232,17 @@ class RegnumScene
             geometry = new THREE.ConeGeometry(vector.x, vector.y, vector.z);
         }
 
-        const material = new THREE.MeshLambertMaterial( {color: color, side: THREE.DoubleSide} );
+        let material = null;
+
+        if (materialMethod == MaterialMethod.Lambert)
+        {
+            material = new THREE.MeshLambertMaterial({color: color, side: THREE.DoubleSide})
+        }
+        else
+        {
+            material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide}) 
+        }
+
         const mesh = new THREE.Mesh(geometry, material);
         this.addToScene(name, mesh);
         return mesh;
