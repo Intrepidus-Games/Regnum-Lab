@@ -165,10 +165,27 @@ function rgbaToHex(r, g, b) {
  *
  * @param {Number} min The lower boundary of the output range
  * @param {Number} max The upper boundary of the output range
- * @returns A number in the range [min, max]
+ * @returns {Number} A number in the range [min, max]
  * @type Number
  */
 function clamp(x, min, max) 
 {
   return Math.min(Math.max(x, min), max);
 };
+
+/**
+ * Returns a number whose value is limited to the given range.
+ *
+ * @param {THREE.Vector3} x The ingoing value
+ * @param {THREE.Vector3} min The lower boundary of the output range
+ * @param {THREE.Vector3} max The upper boundary of the output range
+ * @returns {THREE.Vector3} A vector3 in the range [min, max]
+ */
+function clampVector3(x, min, max)
+{
+  return new THREE.Vector3(
+    clamp(x.x, min.x, max.x),
+    clamp(x.y, min.y, max.y),
+    clamp(x.z, min.z, max.z)
+  );
+}

@@ -47,6 +47,17 @@ class RegnumScene
         this.fonts = {
             "NunitoSansRegular": null
         }
+
+        this.defaultCameraMovement = true;
+
+        // Grid
+        this.gridSize = 115;
+        this.gridLength = this.gridSize/2;
+        this.xColor = 0xff000d;
+        this.yColor = 0x22ba00;
+        this.zColor = 0x0800ff;
+        this.gridColor = 0x363636;
+        this.grid = [];
     }
 
     init()
@@ -71,39 +82,29 @@ class RegnumScene
         // Input Manager
         this.inputManager = new RegnumSceneInputManager(this.canvas.getElementsByTagName("canvas")[0]);
 
-        // Camera Defaults
-        this.camera.position.y = -5;
-        this.camera.position.z = 5;
-        this.camera.rotation.x = deg2rad(45);
+        const sceneAction = new InputAction(InputTriggerMethod.Pressed, InputValueType.Bool, [
+            new Input("f")
+        ], (value) => { this.resetSceneView(); });
+        const sceneMapping = new InputMapping([sceneAction]);
+
+        this.inputManager.addInputMapping(sceneMapping);
 
         // Create scene defaults
 
         // Scene Tree Group
         this.sceneTree = new THREE.Group();
-        this.scene.add( this.sceneTree );
+        this.scene.add(this.sceneTree);
+
+        // Camera Defaults
+        this.resetSceneView();
 
         // Load Fonts
         this.loadFonts(()=>{
-            const x = this.createTextLabel("x", "x", 0xff000d, true);
-            this.createLine("origin", [
-                new THREE.Vector3(0,0,0),
-                new THREE.Vector3(2,0,0)
-            ], 0xff000d);
-
-            const y = this.createTextLabel("y", "y", 0x22ba00, true);
-            this.createLine("origin", [
-                new THREE.Vector3(0,0,0),
-                new THREE.Vector3(0,2,0)
-            ], 0x22ba00);
-            const z = this.createTextLabel("z", "z", 0x0800ff, true);
-            this.createLine("origin", [
-                new THREE.Vector3(0,0,0),
-                new THREE.Vector3(0,0,2)
-            ], 0x0800ff);
-            x.position.x = 2;
-            y.position.y = 2;
-            z.position.z = 2;
+            // Fonts loaded
         });
+
+        // Load grid
+        this.createGrid();
 
         // light
         const light = this.createLight("light", 0xfff, 500000);
@@ -115,13 +116,68 @@ class RegnumScene
 
         //const lightSphere = this.createPrimative("lightCone", Shapes.Cone,new THREE.Vector3(1, 2, 32));
         //light.add(lightSphere);
-        
-        window.addEventListener("resize", ()=>{this.onWindowResize()})
+
+        window.addEventListener("resize", ()=>{this.onWindowResize(); this.canvas.requestPointerLock();})
         this.renderer.domElement.addEventListener("mousedown", ()=>{ this.isDragging=true; })
         this.renderer.domElement.addEventListener("mouseup", ()=>{  this.isDragging=false; })
         this.renderer.domElement.addEventListener("mouseout", ()=>{ this.isDragging=false; })
         this.renderer.domElement.addEventListener("mousemove", (e)=>{ this.mouseMove(e); })
         this.renderer.domElement.addEventListener("wheel", (e)=>{ this.scrollWheel(e); })
+    }
+
+    createGrid()
+    {
+        this.grid.forEach((line)=>{
+            this.sceneTree.remove(line);
+        })
+
+        for(let i=0; i<this.gridSize; i++)
+        {
+            //const offset = this.gridSize % 2 == 0? 0.5 : 0.5;
+            const position = i-(this.gridSize/2)+0.5;
+
+            // Along the y
+            this.createLine("origin", [
+                new THREE.Vector3( this.gridLength,position,0),
+                new THREE.Vector3(-this.gridLength,position,0)
+            ], this.gridColor);
+
+            // Along the x
+            this.createLine("origin", [
+                new THREE.Vector3(position, this.gridLength,0),
+                new THREE.Vector3(position,-this.gridLength,0)
+            ], this.gridColor);
+
+            this.createLine("origin", [
+                new THREE.Vector3(this.gridLength,0,0),
+                new THREE.Vector3(-this.gridLength,0,0)
+            ], this.xColor);
+
+            this.createLine("origin", [
+                new THREE.Vector3(0,this.gridLength,0),
+                new THREE.Vector3(0,-this.gridLength,0)
+            ], this.yColor);
+            this.createLine("origin", [
+                new THREE.Vector3(0,0,this.gridLength),
+                new THREE.Vector3(0,0,-this.gridLength)
+            ], this.zColor);
+        }
+    }
+
+    weldCameraTo(object)
+    {
+        object.add(this.camera);
+    }
+
+    resetSceneView()
+    {
+        // Set Camera
+        this.camera.position.set(0,-5,5);
+        this.camera.rotation.set(deg2rad(45),0,0);
+
+        // Set scene tree
+        this.sceneTree.position.set(0,0,0);
+        this.sceneTree.rotation.set(0,0,0);
     }
 
     loadFonts(callback)
@@ -140,39 +196,42 @@ class RegnumScene
         });
     }
 
-    
-
     scrollWheel(event)
     {
-        
-        const delta = clamp(event.deltaY, -1, 1); // Normalize Delta
-        if (this.camera.position.distanceTo(new THREE.Vector3) > 1 || delta > 0)
+        if (this.defaultCameraMovement)
         {
-            this.camera.translateZ(delta);
+            const delta = clamp(event.deltaY, -1, 1); // Normalize Delta
+            if (this.camera.position.distanceTo(new THREE.Vector3) > 1 || delta > 0)
+            {
+                this.camera.translateZ(delta);
+            }
         }
     }
 
     mouseMove(event)
     {
-        // If the mouse is being dragged
-        if (this.isDragging) {
-            const deltaMove = {
-                x: event.clientX - this.previousMousePosition.x,
-                y: event.clientY - this.previousMousePosition.y
-            };
-        
-            // Example: Rotate the object based on mouse movement
-            //const rotationSpeed = 1;
-            //rotateAround(this.camera, new THREE.Vector3(0,0,0), new THREE.Vector3(-deltaMove.y/2, 0,-deltaMove.x/2));
-            //const quaternion = new THREE.Quaternion();
-            //quaternion.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), -deltaMove.x/2 * this.sensitivity / Math.PI / 2 );
+        if (this.defaultCameraMovement)
+        {
+            // If the mouse is being dragged
+            if (this.isDragging) {
+                const deltaMove = {
+                    x: event.clientX - this.previousMousePosition.x,
+                    y: event.clientY - this.previousMousePosition.y
+                };
+            
+                // Example: Rotate the object based on mouse movement
+                //const rotationSpeed = 1;
+                //rotateAround(this.camera, new THREE.Vector3(0,0,0), new THREE.Vector3(-deltaMove.y/2, 0,-deltaMove.x/2));
+                //const quaternion = new THREE.Quaternion();
+                //quaternion.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), -deltaMove.x/2 * this.sensitivity / Math.PI / 2 );
+            
+                //this.sceneTree.applyQuaternion(quaternion);
+                this.sceneTree.rotation.z += deltaMove.x * this.sensitivity / 16 / Math.PI;
+                this.sceneTree.rotation.x += deltaMove.y * this.sensitivity / 16 / Math.PI;
+            }
 
-            //this.sceneTree.applyQuaternion(quaternion);
-            this.sceneTree.rotation.z += deltaMove.x * this.sensitivity / 16 / Math.PI;
-            this.sceneTree.rotation.x += deltaMove.y * this.sensitivity / 16 / Math.PI;
+            this.previousMousePosition = { x: event.clientX, y: event.clientY };
         }
-        
-        this.previousMousePosition = { x: event.clientX, y: event.clientY };
     }
 
     onWindowResize()

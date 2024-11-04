@@ -50,6 +50,7 @@ class RegnumLab
             console.error(`The event: '${event} does not exist.'`);
         }
     }
+    
 }
 
 const REGNUMLAB = new RegnumLab();
