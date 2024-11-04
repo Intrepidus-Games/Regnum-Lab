@@ -183,6 +183,7 @@ function clamp(x, min, max)
  */
 function clampVector3(x, min, max)
 {
+  
   return new THREE.Vector3(
     clamp(x.x, min.x, max.x),
     clamp(x.y, min.y, max.y),

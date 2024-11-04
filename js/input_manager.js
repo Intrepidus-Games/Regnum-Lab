@@ -262,11 +262,7 @@ class RegnumSceneInputManager
                 event.preventDefault();
                //event.returnValue = ''; // Some browsers require this for the dialog to show
             });
-            window.addEventListener("unload", (event) => {
-                event.preventDefault();
-            });
             this.canvas.addEventListener("keydown", (e)=>{ 
-                e.preventDefault();
                 this.manageInputMethod(e.key.toLowerCase(), InputTriggerMethod.Down); 
             })
             this.canvas.addEventListener("keyup", (e)=>{ 
